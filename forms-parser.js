@@ -89,11 +89,13 @@ class GoogleFormsParser {
         
         const questionText = questionData[0]; // Question text
         const questionType = item[3]; // Question type
+        const entryId = item[4] && item[4][0] && item[4][0][0]; // Entry ID for submission
         
         if (!questionText) return;
         
         const question = {
           id: index + 1,
+          entryId: entryId || null, // Store entry ID for submission
           text: questionText,
           type: 'text',
           options: null

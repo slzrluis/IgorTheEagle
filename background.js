@@ -8,10 +8,7 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.sync.set({
         settings: {
           formUrl: '',
-          voiceEnabled: true,
-          clickEnabled: true,
-          voiceType: 'deep-male',
-          microphoneEnabled: true
+          autoAdvance: true
         }
       });
     }

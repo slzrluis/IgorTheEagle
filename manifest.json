@@ -38,7 +38,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*", "sounds/*", "igor.html", "forms-parser.js", "igor-assistant.js"],
+      "resources": ["images/*", "sounds/*", "igor.html", "forms-parser.js", "forms-submitter.js", "igor-assistant.js"],
       "matches": ["<all_urls>"]
     }
   ]

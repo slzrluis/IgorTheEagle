@@ -19,12 +19,7 @@ function loadSettings() {
       const settings = result.settings;
       
       document.getElementById('form-url').value = settings.formUrl || '';
-      document.getElementById('voice-enabled').checked = settings.voiceEnabled !== false;
-      document.getElementById('microphone-enabled').checked = settings.microphoneEnabled !== false;
-      document.getElementById('click-enabled').checked = settings.clickEnabled !== false;
-      
-      const voiceType = settings.voiceType || 'deep-male';
-      document.querySelector(`input[name="voice-type"][value="${voiceType}"]`).checked = true;
+      document.getElementById('auto-advance').checked = settings.autoAdvance !== false;
     }
   });
 }
@@ -32,10 +27,7 @@ function loadSettings() {
 function saveSettings() {
   const settings = {
     formUrl: document.getElementById('form-url').value,
-    voiceEnabled: document.getElementById('voice-enabled').checked,
-    microphoneEnabled: document.getElementById('microphone-enabled').checked,
-    clickEnabled: document.getElementById('click-enabled').checked,
-    voiceType: document.querySelector('input[name="voice-type"]:checked').value
+    autoAdvance: document.getElementById('auto-advance').checked
   };
   
   chrome.storage.sync.set({ settings }, () => {
@@ -53,10 +45,7 @@ function resetSettings() {
   if (confirm('Are you sure you want to reset all settings to defaults?')) {
     const defaultSettings = {
       formUrl: '',
-      voiceEnabled: true,
-      clickEnabled: true,
-      voiceType: 'deep-male',
-      microphoneEnabled: true
+      autoAdvance: true
     };
     
     chrome.storage.sync.set({ settings: defaultSettings }, () => {

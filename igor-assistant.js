@@ -1,23 +1,19 @@
-// Igor Assistant JavaScript
+// Igor Assistant JavaScript - Form Completion Focus
 class IgorAssistant {
   constructor() {
     this.currentQuestionIndex = 0;
     this.questions = [];
-    this.answers = {};
     this.settings = {};
-    this.recognition = null;
-    this.synthesis = window.speechSynthesis;
-    this.isListening = false;
+    this.submitter = null;
     
     this.init();
   }
   
   async init() {
+    console.log('Igor initializing...');
+    
     // Load settings
     await this.loadSettings();
-    
-    // Setup speech recognition
-    this.setupSpeechRecognition();
     
     // Setup event listeners
     this.setupEventListeners();
@@ -34,115 +30,68 @@ class IgorAssistant {
       chrome.runtime.sendMessage({ action: 'getSettings' }, (response) => {
         this.settings = response.settings || {
           formUrl: '',
-          voiceEnabled: true,
+          voiceEnabled: false,
           clickEnabled: true,
           voiceType: 'deep-male',
-          microphoneEnabled: true
+          microphoneEnabled: false
         };
+        console.log('Settings loaded:', this.settings);
         resolve();
       });
     });
-  }
-  
-  setupSpeechRecognition() {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = false;
-      this.recognition.interimResults = false;
-      this.recognition.lang = 'en-US';
-      
-      this.recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        this.handleVoiceAnswer(transcript);
-      };
-      
-      this.recognition.onend = () => {
-        this.isListening = false;
-        document.getElementById('mic-button').classList.remove('listening');
-      };
-      
-      this.recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        this.isListening = false;
-        document.getElementById('mic-button').classList.remove('listening');
-      };
-    }
   }
   
   setupEventListeners() {
     document.getElementById('close-button').addEventListener('click', () => {
       window.parent.postMessage({ action: 'closeIgor' }, '*');
     });
-    
-    document.getElementById('mic-button').addEventListener('click', () => {
-      this.toggleMicrophone();
-    });
-    
-    document.getElementById('speaker-button').addEventListener('click', () => {
-      this.speakQuestion();
-    });
   }
   
   async loadFormQuestions() {
     // Check if user has configured a form URL
-    if (this.settings.formUrl && this.settings.formUrl.trim()) {
-      try {
-        console.log('Loading questions from form:', this.settings.formUrl);
-        const parser = new GoogleFormsParser(this.settings.formUrl);
-        this.questions = await parser.fetchQuestions();
-        
-        if (this.questions.length === 0) {
-          console.warn('No questions found, using demo questions');
-          this.loadDemoQuestions();
-        } else {
-          console.log(`Loaded ${this.questions.length} questions from form`);
-        }
-      } catch (error) {
-        console.error('Error loading form questions:', error);
-        alert(`Could not load questions from form: ${error.message}\n\nUsing demo questions instead.`);
-        this.loadDemoQuestions();
+    if (!this.settings.formUrl || !this.settings.formUrl.trim()) {
+      console.log('No form URL configured');
+      this.showNoFormMessage();
+      return;
+    }
+    
+    try {
+      console.log('Loading questions from form:', this.settings.formUrl);
+      const parser = new GoogleFormsParser(this.settings.formUrl);
+      this.questions = await parser.fetchQuestions();
+      
+      if (this.questions.length === 0) {
+        console.warn('No questions found in form');
+        this.showError('No questions found in the form. Please check the form URL.');
+        return;
       }
-    } else {
-      console.log('No form URL configured, using demo questions');
-      this.loadDemoQuestions();
+      
+      console.log(`Loaded ${this.questions.length} questions from form`);
+      // Initialize submitter with questions for entry ID mapping
+      this.submitter = new GoogleFormsSubmitter(this.settings.formUrl, parser.formId, this.questions);
+    } catch (error) {
+      console.error('Error loading form questions:', error);
+      this.showError(`Could not load questions from form:\n${error.message}\n\nPlease check the form URL in settings.`);
     }
   }
   
-  loadDemoQuestions() {
-    // Demo questions for testing
-    this.questions = [
-      {
-        id: 1,
-        text: "What's your name, champ?",
-        type: "text",
-        options: null
-      },
-      {
-        id: 2,
-        text: "How are you feeling today?",
-        type: "multiple_choice",
-        options: ["Pumped!", "Pretty good", "Okay", "Not great"]
-      },
-      {
-        id: 3,
-        text: "What's your favorite way to stay active?",
-        type: "multiple_choice",
-        options: ["Lifting weights", "Running", "Sports", "Yoga", "Walking"]
-      },
-      {
-        id: 4,
-        text: "On a scale of 1-10, how's your energy level?",
-        type: "multiple_choice",
-        options: ["1-2 (Low)", "3-4 (Below average)", "5-6 (Average)", "7-8 (Good)", "9-10 (High!)"]
-      },
-      {
-        id: 5,
-        text: "Any feedback you want to share?",
-        type: "text",
-        options: null
-      }
-    ];
+  showNoFormMessage() {
+    const questionText = document.getElementById('question-text');
+    const answersContainer = document.getElementById('answers-container');
+    const questionCounter = document.getElementById('question-counter');
+    
+    questionCounter.textContent = 'Setup Required';
+    questionText.innerHTML = '<strong>Please link a Google Form</strong><br><br>Go to Settings and add your Google Form URL to get started.';
+    answersContainer.innerHTML = '';
+    
+    const settingsBtn = document.createElement('button');
+    settingsBtn.className = 'submit-button';
+    settingsBtn.textContent = 'Open Settings';
+    settingsBtn.addEventListener('click', () => {
+      chrome.runtime.openOptionsPage();
+    });
+    
+    answersContainer.appendChild(settingsBtn);
   }
   
   showQuestion() {
@@ -154,187 +103,138 @@ class IgorAssistant {
     const question = this.questions[this.currentQuestionIndex];
     const questionText = document.getElementById('question-text');
     const answersContainer = document.getElementById('answers-container');
+    const questionCounter = document.getElementById('question-counter');
     
+    // Update question counter
+    questionCounter.textContent = `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
+    
+    // Update question text
     questionText.textContent = question.text;
     answersContainer.innerHTML = '';
     
-    if (question.type === 'multiple_choice' && this.settings.clickEnabled) {
-      question.options.forEach((option, index) => {
+    if (question.type === 'multiple_choice' && question.options && question.options.length > 0) {
+      // Show multiple choice buttons
+      question.options.forEach((option) => {
         const button = document.createElement('button');
         button.className = 'answer-button';
         button.textContent = option;
         button.addEventListener('click', () => this.handleAnswer(option));
         answersContainer.appendChild(button);
       });
-    } else if (question.type === 'text') {
+    } else {
+      // Show text input
       const input = document.createElement('input');
       input.type = 'text';
-      input.placeholder = 'Type your answer or use the microphone...';
-      input.style.width = '100%';
-      input.style.padding = '10px';
-      input.style.borderRadius = '8px';
-      input.style.border = '2px solid #667eea';
-      input.style.fontSize = '13px';
+      input.className = 'text-input';
+      input.placeholder = 'Type your answer...';
+      input.id = 'text-answer-input';
       
       const submitBtn = document.createElement('button');
-      submitBtn.className = 'answer-button';
-      submitBtn.textContent = 'Submit';
-      submitBtn.style.marginTop = '10px';
+      submitBtn.className = 'submit-button';
+      submitBtn.textContent = 'Submit Answer';
       submitBtn.addEventListener('click', () => {
-        if (input.value.trim()) {
-          this.handleAnswer(input.value);
+        const value = input.value.trim();
+        if (value) {
+          this.handleAnswer(value);
         }
       });
       
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && input.value.trim()) {
-          this.handleAnswer(input.value);
+        if (e.key === 'Enter') {
+          const value = input.value.trim();
+          if (value) {
+            this.handleAnswer(value);
+          }
         }
       });
       
       answersContainer.appendChild(input);
       answersContainer.appendChild(submitBtn);
+      
+      // Auto-focus the input
+      setTimeout(() => input.focus(), 100);
     }
     
     // Update progress bar
     const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
     document.getElementById('progress-fill').style.width = progress + '%';
-    
-    // Auto-read question if voice is enabled
-    if (this.settings.voiceEnabled) {
-      setTimeout(() => this.speakQuestion(), 500);
-    }
   }
   
   handleAnswer(answer) {
     const question = this.questions[this.currentQuestionIndex];
-    this.answers[question.id] = answer;
+    
+    console.log(`Question ${question.id}: ${question.text}`);
+    console.log(`Answer: ${answer}`);
+    
+    // Store the answer
+    if (this.submitter) {
+      this.submitter.addResponse(question.id, answer);
+    }
     
     // Move to next question
     this.currentQuestionIndex++;
     this.showQuestion();
   }
   
-  handleVoiceAnswer(transcript) {
-    const question = this.questions[this.currentQuestionIndex];
-    
-    if (question.type === 'multiple_choice') {
-      // Try to match the transcript with one of the options
-      const matchedOption = question.options.find(option => 
-        transcript.toLowerCase().includes(option.toLowerCase()) ||
-        option.toLowerCase().includes(transcript.toLowerCase())
-      );
-      
-      if (matchedOption) {
-        this.handleAnswer(matchedOption);
-      } else {
-        this.speak("I didn't catch that. Try again, buddy!");
-      }
-    } else {
-      // For text questions, accept the full transcript
-      this.handleAnswer(transcript);
-    }
-  }
-  
-  toggleMicrophone() {
-    if (!this.recognition) {
-      this.speak("Sorry champ, your browser doesn't support voice recognition!");
-      return;
-    }
-    
-    if (this.isListening) {
-      this.recognition.stop();
-      this.isListening = false;
-      document.getElementById('mic-button').classList.remove('listening');
-    } else {
-      this.recognition.start();
-      this.isListening = true;
-      document.getElementById('mic-button').classList.add('listening');
-    }
-  }
-  
-  speakQuestion() {
-    const question = this.questions[this.currentQuestionIndex];
-    this.speak(question.text);
-  }
-  
-  speak(text) {
-    if (!this.synthesis) return;
-    
-    // Cancel any ongoing speech
-    this.synthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Configure voice to be deep male
-    utterance.pitch = 0.5; // Lower pitch
-    utterance.rate = 0.9; // Slightly slower
-    utterance.volume = 1.0;
-    
-    // Try to find a male voice
-    const voices = this.synthesis.getVoices();
-    const maleVoice = voices.find(voice => 
-      voice.name.toLowerCase().includes('male') || 
-      voice.name.toLowerCase().includes('daniel') ||
-      voice.name.toLowerCase().includes('david')
-    );
-    
-    if (maleVoice) {
-      utterance.voice = maleVoice;
-    }
-    
-    this.synthesis.speak(utterance);
-  }
-  
-  showCompletion() {
+  async showCompletion() {
     const questionText = document.getElementById('question-text');
     const answersContainer = document.getElementById('answers-container');
+    const questionCounter = document.getElementById('question-counter');
     
-    questionText.textContent = "💪 Awesome job! You crushed it! Your answers have been saved.";
+    questionCounter.textContent = `Complete! ${this.questions.length} of ${this.questions.length}`;
+    questionText.textContent = "Great job! You've completed all questions.";
     answersContainer.innerHTML = '';
     
-    // Save responses
-    this.saveResponses();
+    // Create submission status
+    const statusDiv = document.createElement('div');
+    statusDiv.style.cssText = 'text-align: center; padding: 10px;';
+    statusDiv.innerHTML = '<p style="color: #555; font-size: 13px;">Submitting your responses...</p>';
+    answersContainer.appendChild(statusDiv);
     
-    // Speak completion message
-    if (this.settings.voiceEnabled) {
-      this.speak("Awesome job champ! You crushed it! Your answers have been saved.");
+    // Submit the form
+    try {
+      if (this.submitter) {
+        await this.submitter.submitForm();
+        statusDiv.innerHTML = '<p style="color: #4ECDC4; font-weight: bold;">✓ Responses saved!</p>';
+        
+        console.log('All responses:', this.submitter.getAllResponses());
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      statusDiv.innerHTML = '<p style="color: #FF6B6B;">Error saving responses</p>';
     }
     
-    // Auto-close after 3 seconds
+    // Progress bar to 100%
+    document.getElementById('progress-fill').style.width = '100%';
+    
+    // Auto-close after 2 seconds
     setTimeout(() => {
       window.parent.postMessage({ action: 'closeIgor' }, '*');
-    }, 3000);
+    }, 2000);
   }
   
-  saveResponses() {
-    chrome.runtime.sendMessage({
-      action: 'saveFormResponse',
-      data: {
-        formUrl: this.settings.formUrl,
-        answers: this.answers,
-        timestamp: new Date().toISOString()
-      }
+  showError(message) {
+    const questionText = document.getElementById('question-text');
+    questionText.textContent = message;
+    
+    // Show OK button to dismiss
+    const answersContainer = document.getElementById('answers-container');
+    answersContainer.innerHTML = '';
+    
+    const okBtn = document.createElement('button');
+    okBtn.className = 'submit-button';
+    okBtn.textContent = 'OK';
+    okBtn.style.marginTop = '10px';
+    okBtn.addEventListener('click', () => {
+      this.showQuestion();
     });
+    
+    answersContainer.appendChild(okBtn);
   }
 }
 
 // Initialize Igor when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-  // Wait for voices to load
-  if (window.speechSynthesis) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      new IgorAssistant();
-    };
-    
-    // Fallback in case voices are already loaded
-    setTimeout(() => {
-      if (window.speechSynthesis.getVoices().length > 0 || !window.igorInitialized) {
-        window.igorInitialized = true;
-        new IgorAssistant();
-      }
-    }, 100);
-  } else {
-    new IgorAssistant();
-  }
+  console.log('DOM loaded, initializing Igor...');
+  new IgorAssistant();
 });

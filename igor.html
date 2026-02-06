@@ -10,8 +10,8 @@
     }
     
     body {
-      width: 350px;
-      height: 450px;
+      width: 320px;
+      height: 400px;
       overflow: hidden;
       font-family: 'Arial', sans-serif;
     }
@@ -20,43 +20,78 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 20px;
+      border-radius: 15px;
       position: relative;
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #igor-header {
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    #question-counter {
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    
+    #close-button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      transition: background 0.3s;
+    }
+    
+    #close-button:hover {
+      background: rgba(255,255,255,0.4);
     }
     
     #igor-eagle {
-      width: 120px;
-      height: 120px;
-      margin: 20px auto;
+      width: 80px;
+      height: 80px;
+      margin: 10px auto;
       position: relative;
       animation: float 3s ease-in-out infinite;
+      flex-shrink: 0;
     }
     
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-8px); }
     }
     
     .eagle-body {
-      width: 80px;
-      height: 100px;
+      width: 60px;
+      height: 75px;
       background: #8B4513;
       border-radius: 50% 50% 40% 40%;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
+      box-shadow: inset 0 -8px 15px rgba(0,0,0,0.2);
     }
     
     .eagle-head {
-      width: 60px;
-      height: 50px;
+      width: 45px;
+      height: 38px;
       background: #FFFFFF;
       border-radius: 50% 50% 30% 30%;
       position: absolute;
-      top: -25px;
+      top: -20px;
       left: 50%;
       transform: translateX(-50%);
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -65,56 +100,50 @@
     .eagle-beak {
       width: 0;
       height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-top: 25px solid #FFD700;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 20px solid #FFD700;
       position: absolute;
-      bottom: -10px;
+      bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
-      animation: beak-open 2s ease-in-out infinite;
-    }
-    
-    @keyframes beak-open {
-      0%, 90%, 100% { transform: translateX(-50%) scaleY(1); }
-      95% { transform: translateX(-50%) scaleY(1.2); }
     }
     
     .eagle-eye {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       background: #000;
       border-radius: 50%;
       position: absolute;
-      top: 15px;
+      top: 12px;
       animation: blink 4s ease-in-out infinite;
     }
     
-    .eagle-eye.left { left: 12px; }
-    .eagle-eye.right { right: 12px; }
+    .eagle-eye.left { left: 10px; }
+    .eagle-eye.right { right: 10px; }
     
     @keyframes blink {
-      0%, 98%, 100% { height: 12px; }
+      0%, 98%, 100% { height: 10px; }
       99% { height: 2px; }
     }
     
     .wing {
-      width: 40px;
-      height: 60px;
+      width: 32px;
+      height: 48px;
       background: #654321;
       border-radius: 50% 0 50% 50%;
       position: absolute;
-      top: 30px;
+      top: 25px;
       animation: flap 1.5s ease-in-out infinite;
     }
     
     .wing.left {
-      left: -15px;
+      left: -12px;
       transform-origin: right center;
     }
     
     .wing.right {
-      right: -15px;
+      right: -12px;
       transform-origin: left center;
       transform: scaleX(-1);
     }
@@ -133,109 +162,117 @@
       50% { transform: scaleX(-1) rotate(-30deg); }
     }
     
+    #content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 15px 15px;
+      min-height: 0;
+    }
+    
+    #content-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #content-area::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    
+    #content-area::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+    
+    #content-area::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    
     #speech-bubble {
       background: white;
-      border-radius: 20px;
-      padding: 15px 20px;
-      margin: 10px 20px;
+      border-radius: 15px;
+      padding: 15px;
       position: relative;
-      min-height: 80px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
     #speech-bubble:before {
       content: '';
       position: absolute;
-      top: -10px;
+      top: -8px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 10px solid white;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid white;
     }
     
     #question-text {
       color: #333;
       font-size: 14px;
       line-height: 1.5;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    
+    #question-text::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    #question-text::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 2px;
     }
     
     #answers-container {
       margin-top: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    
+    #answers-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    #answers-container::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 2px;
     }
     
     .answer-button {
       display: block;
       width: 100%;
-      padding: 10px;
-      margin: 5px 0;
+      padding: 10px 12px;
+      margin: 6px 0;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
       transition: transform 0.2s, box-shadow 0.2s;
+      text-align: left;
     }
     
     .answer-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
     .answer-button:active {
       transform: translateY(0);
     }
     
-    #voice-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 20px;
-    }
-    
-    .control-button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .mic-button {
-      background: #FF6B6B;
-      color: white;
-    }
-    
-    .mic-button.listening {
-      background: #4ECDC4;
-      animation: pulse 1s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.7); }
-      50% { box-shadow: 0 0 0 10px rgba(78, 205, 196, 0); }
-    }
-    
-    .speaker-button {
-      background: #FFD93D;
-      color: #333;
-    }
-    
     #progress-bar {
       height: 4px;
       background: rgba(255,255,255,0.3);
-      margin: 0 20px;
-      border-radius: 2px;
+      margin: 0;
+      border-radius: 0 0 15px 15px;
       overflow: hidden;
+      flex-shrink: 0;
     }
     
     #progress-fill {
@@ -245,30 +282,46 @@
       transition: width 0.3s;
     }
     
-    #close-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255,255,255,0.2);
-      border: none;
+    .text-input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
+      margin-bottom: 8px;
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .submit-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #4ECDC4;
       color: white;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 20px;
-      line-height: 1;
+      font-size: 14px;
+      font-weight: bold;
       transition: background 0.3s;
     }
     
-    #close-button:hover {
-      background: rgba(255,255,255,0.4);
+    .submit-button:hover {
+      background: #45b8ac;
     }
   </style>
 </head>
 <body>
   <div id="igor-container">
-    <button id="close-button">×</button>
+    <div id="igor-header">
+      <div id="question-counter">Question 1 of 5</div>
+      <button id="close-button">×</button>
+    </div>
     
     <div id="igor-eagle">
       <div class="eagle-body">
@@ -282,20 +335,11 @@
       </div>
     </div>
     
-    <div id="speech-bubble">
-      <div id="question-text">Hey there! I'm Igor, your mighty eagle assistant! Ready to tackle that form? &#128170;</div>
-      <div id="answers-container"></div>
-    </div>
-    
-    <div id="voice-controls">
-      <button class="control-button mic-button" id="mic-button">
-        <span>&#127908;</span>
-        <span>Speak</span>
-      </button>
-      <button class="control-button speaker-button" id="speaker-button">
-        <span>&#128266;</span>
-        <span>Read</span>
-      </button>
+    <div id="content-area">
+      <div id="speech-bubble">
+        <div id="question-text">Loading questions...</div>
+        <div id="answers-container"></div>
+      </div>
     </div>
     
     <div id="progress-bar">
@@ -304,6 +348,7 @@
   </div>
   
   <script src="forms-parser.js"></script>
+  <script src="forms-submitter.js"></script>
   <script src="igor-assistant.js"></script>
 </body>
 </html>

@@ -55,10 +55,10 @@ function showIgor() {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 350px;
-    height: 450px;
+    width: 320px;
+    height: 400px;
     border: none;
-    border-radius: 20px;
+    border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     z-index: 2147483647;
     background: transparent;
