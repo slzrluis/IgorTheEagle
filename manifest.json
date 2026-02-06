@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Igor - Your Eagle Assistant",
+  "version": "1.0.0",
+  "description": "An animated eagle assistant that helps you fill out Google Forms with voice and click interactions",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://docs.google.com/*",
+    "https://drive.google.com/*"
+  ],
+  "action": {
+    "default_popup": "",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["igor.css"]
+    }
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*", "sounds/*", "igor.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

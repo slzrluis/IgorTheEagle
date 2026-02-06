@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Igor Assistant Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .eagle-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section h2 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-icon {
+      font-size: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="url"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input[type="text"]:focus,
+    .form-group input[type="url"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .checkbox-group label {
+      color: #555;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0;
+    }
+    
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .radio-option:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .radio-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .radio-option label {
+      cursor: pointer;
+      flex: 1;
+      margin: 0;
+      color: #555;
+    }
+    
+    .help-text {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #555;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .btn-danger {
+      background: #ff6b6b;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #ff5252;
+    }
+    
+    .alert {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .alert.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    
+    .permissions-list {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    
+    .permissions-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .permissions-list li {
+      padding: 8px 0;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .permissions-list li::before {
+      content: '✓';
+      color: #4ECDC4;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="eagle-icon">🦅</div>
+      <h1>Igor Assistant Settings</h1>
+      <p>Configure your mighty eagle companion</p>
+    </div>
+    
+    <div class="content">
+      <div id="save-alert" class="alert alert-success">
+        Settings saved successfully! 💪
+      </div>
+      
+      <!-- Google Form Integration -->
+      <div class="section">
+        <h2><span class="section-icon">📝</span> Google Form Integration</h2>
+        <div class="form-group">
+          <label for="form-url">Google Form URL or ID</label>
+          <input type="url" id="form-url" placeholder="https://docs.google.com/forms/d/...">
+          <div class="help-text">Paste the URL of your Google Form. Igor will fetch questions from this form.</div>
+        </div>
+      </div>
+      
+      <!-- Voice Settings -->
+      <div class="section">
+        <h2><span class="section-icon">🎤</span> Voice & Audio Settings</h2>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="voice-enabled" checked>
+          <label for="voice-enabled">Enable Text-to-Speech (Igor reads questions aloud)</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="microphone-enabled" checked>
+          <label for="microphone-enabled">Enable Microphone (Voice answers)</label>
+        </div>
+        
+        <div class="form-group">
+          <label>Voice Type</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="voice-deep" name="voice-type" value="deep-male" checked>
+              <label for="voice-deep">Deep Male Voice (200lb bench press style 💪)</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="voice-normal" name="voice-type" value="normal">
+              <label for="voice-normal">Normal Voice</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Interaction Settings -->
+      <div class="section">
+        <h2><span class="section-icon">👆</span> Interaction Mode</h2>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="click-enabled" checked>
+          <label for="click-enabled">Enable Click/Tap Answers (Multiple choice buttons)</label>
+        </div>
+        
+        <div class="help-text">
+          You can enable both voice and click modes. Igor will adapt based on the question type.
+        </div>
+      </div>
+      
+      <!-- Permissions -->
+      <div class="section">
+        <h2><span class="section-icon">🔒</span> Permissions</h2>
+        <div class="permissions-list">
+          <ul>
+            <li>Storage - Save your settings and responses</li>
+            <li>Active Tab - Show Igor on any webpage</li>
+            <li>Google Docs/Forms - Access your forms</li>
+            <li>Microphone - Voice input (only when you press the mic button)</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="section">
+        <h2><span class="section-icon">⚙️</span> Extension Management</h2>
+        <div class="button-group">
+          <button class="btn btn-secondary" id="reset-btn">Reset to Defaults</button>
+          <button class="btn btn-danger" id="uninstall-btn">Uninstall Extension</button>
+        </div>
+      </div>
+      
+      <!-- Save Button -->
+      <div class="button-group">
+        <button class="btn btn-primary" id="save-btn">💾 Save Settings</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>
