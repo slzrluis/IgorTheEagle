@@ -85,8 +85,32 @@ class IgorAssistant {
   }
   
   async loadFormQuestions() {
-    // This is a demo version with sample questions
-    // In production, this would fetch from Google Forms API
+    // Check if user has configured a form URL
+    if (this.settings.formUrl && this.settings.formUrl.trim()) {
+      try {
+        console.log('Loading questions from form:', this.settings.formUrl);
+        const parser = new GoogleFormsParser(this.settings.formUrl);
+        this.questions = await parser.fetchQuestions();
+        
+        if (this.questions.length === 0) {
+          console.warn('No questions found, using demo questions');
+          this.loadDemoQuestions();
+        } else {
+          console.log(`Loaded ${this.questions.length} questions from form`);
+        }
+      } catch (error) {
+        console.error('Error loading form questions:', error);
+        alert(`Could not load questions from form: ${error.message}\n\nUsing demo questions instead.`);
+        this.loadDemoQuestions();
+      }
+    } else {
+      console.log('No form URL configured, using demo questions');
+      this.loadDemoQuestions();
+    }
+  }
+  
+  loadDemoQuestions() {
+    // Demo questions for testing
     this.questions = [
       {
         id: 1,

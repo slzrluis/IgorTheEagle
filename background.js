@@ -19,9 +19,36 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Handle extension icon click
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
+  console.log('Extension icon clicked! Tab ID:', tab.id, 'URL:', tab.url);
+  
   // Inject Igor into the current tab
-  chrome.tabs.sendMessage(tab.id, { action: 'toggleIgor' });
+  try {
+    console.log('Attempting to send message to tab...');
+    await chrome.tabs.sendMessage(tab.id, { action: 'toggleIgor' });
+    console.log('Message sent successfully');
+  } catch (error) {
+    console.log('Message failed, injecting content script:', error);
+    
+    // Content script not ready yet, inject it first
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      });
+      console.log('Content script injected');
+      
+      // Small delay to let content script initialize
+      setTimeout(() => {
+        chrome.tabs.sendMessage(tab.id, { action: 'toggleIgor' }).catch((err) => {
+          console.log('Could not send message to tab:', err);
+        });
+      }, 100);
+    } catch (err) {
+      console.error('Cannot inject into this page:', err);
+      alert('Igor cannot run on this page. Try a regular website like google.com');
+    }
+  }
 });
 
 // Listen for messages from content script

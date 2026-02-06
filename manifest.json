@@ -6,6 +6,7 @@
   "permissions": [
     "storage",
     "activeTab",
+    "scripting",
     "identity"
   ],
   "host_permissions": [
@@ -13,11 +14,10 @@
     "https://drive.google.com/*"
   ],
   "action": {
-    "default_popup": "",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "16": "icon/icon16.png",
+      "48": "icon/icon48.png",
+      "128": "icon/icon128.png"
     }
   },
   "background": {
@@ -32,13 +32,13 @@
   ],
   "options_page": "options.html",
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "icon/icon16.png",
+    "48": "icon/icon48.png",
+    "128": "icon/icon128.png"
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*", "sounds/*", "igor.html"],
+      "resources": ["images/*", "sounds/*", "igor.html", "forms-parser.js", "igor-assistant.js"],
       "matches": ["<all_urls>"]
     }
   ]
